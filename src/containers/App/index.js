@@ -22,8 +22,6 @@ class App extends Component {
     let _this = this;
 
     postsRef.on('value', function(snapshot) {
-      console.log(snapshot.val());
-
       _this.setState({
         posts: snapshot.val(),
         loading: false
@@ -36,7 +34,7 @@ class App extends Component {
       <div className="App">
         {this.props.children && React.cloneElement(this.props.children, {
           // https://github.com/ReactTraining/react-router/blob/v3/examples/passing-props-to-children/app.js#L56-L58
-          firebaseRef: firebase.database().ref('posts'),
+          firebase: firebase.database(),
           posts: this.state.posts,
           loading: this.state.loading
         })}

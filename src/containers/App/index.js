@@ -13,7 +13,7 @@ class App extends Component {
 
   state = {
     posts: [],
-    loading: false
+    loading: true
   };
 
   componentWillMount() {

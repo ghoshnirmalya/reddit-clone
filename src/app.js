@@ -1,6 +1,6 @@
 import { Container, Flex, Spinner, VStack } from "@chakra-ui/core";
 import React, { useEffect, useState } from "react";
-import AddNewPost from "./components/add-new-post";
+import Navbar from "./components/navbar";
 import Post from "./components/post";
 import db from "./lib/firebase";
 
@@ -12,6 +12,7 @@ const App = () => {
     // Hook to handle the initial fetching of posts
 
     db.collection("posts")
+      .orderBy("createdAt", "desc")
       .get()
       .then((querySnapshot) => {
         const data = querySnapshot.docs.map((doc) => ({
@@ -28,18 +29,20 @@ const App = () => {
     // Hook to handle the real-time updating of posts whenever there is a
     // change in the datastore (https://firebase.google.com/docs/firestore/query-data/listen#view_changes_between_snapshots)
 
-    db.collection("posts").onSnapshot((querySnapshot) => {
-      const _posts = [];
+    db.collection("posts")
+      .orderBy("createdAt", "desc")
+      .onSnapshot((querySnapshot) => {
+        const _posts = [];
 
-      querySnapshot.forEach((doc) => {
-        _posts.push({
-          id: doc.id,
-          ...doc.data(),
+        querySnapshot.forEach((doc) => {
+          _posts.push({
+            id: doc.id,
+            ...doc.data(),
+          });
         });
-      });
 
-      setPosts(_posts);
-    });
+        setPosts(_posts);
+      });
   }, []);
 
   if (isLoading) {
@@ -51,16 +54,16 @@ const App = () => {
   }
 
   return (
-    <Container maxW="md" centerContent p={8}>
-      <VStack spacing={8} w="100%">
-        <Flex justifyContent="flex-end" w="100%">
-          <AddNewPost />
-        </Flex>
-        {posts.map((post) => (
-          <Post post={post} key={post.id} />
-        ))}
-      </VStack>
-    </Container>
+    <>
+      <Navbar />
+      <Container maxW="md" centerContent p={8}>
+        <VStack spacing={8} w="100%">
+          {posts.map((post) => (
+            <Post post={post} key={post.id} />
+          ))}
+        </VStack>
+      </Container>
+    </>
   );
 };
 

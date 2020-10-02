@@ -2,7 +2,7 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Input,
+  Textarea,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  HStack,
   useDisclosure,
 } from "@chakra-ui/core";
 import React, { useState } from "react";
@@ -18,16 +19,24 @@ import db from "../lib/firebase";
 const AddNewPost = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [title, setTitle] = useState("");
+  const [isSaving, setSaving] = useState(false);
 
   const handleSubmit = async () => {
+    setSaving(true);
+
+    const date = new Date();
+
     await db.collection("posts").add({
       title,
-      upvotes: 0,
-      downvotes: 0,
+      upVotesCount: 0,
+      downVotesCount: 0,
+      createdAt: date.toUTCString(),
+      updatedAt: date.toUTCString(),
     });
 
     onClose();
     setTitle("");
+    setSaving(false);
   };
 
   return (
@@ -44,7 +53,7 @@ const AddNewPost = () => {
             <ModalBody>
               <FormControl id="post-title">
                 <FormLabel>Post title</FormLabel>
-                <Input
+                <Textarea
                   type="post-title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -52,8 +61,17 @@ const AddNewPost = () => {
               </FormControl>
             </ModalBody>
             <ModalFooter>
-              <Button onClick={handleSubmit}>Save</Button>
-              <Button onClick={onClose}>Close</Button>
+              <HStack spacing={4}>
+                <Button onClick={onClose}>Close</Button>
+                <Button
+                  onClick={handleSubmit}
+                  colorScheme="blue"
+                  disabled={!title.trim()}
+                  isLoading={isSaving}
+                >
+                  Save
+                </Button>
+              </HStack>
             </ModalFooter>
           </ModalContent>
         </ModalOverlay>
